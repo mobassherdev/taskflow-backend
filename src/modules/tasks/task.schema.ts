@@ -4,9 +4,7 @@ export const createTaskSchema = z.object({
   title: z.string().min(2).max(200),
   description: z.string().max(2000).optional(),
   assigneeId: z.string().optional(),
-  dueDate: z.coerce.date().refine(d => d > new Date(), {
-    message: 'Please select a valid deadline (must be in the future)',
-  }).optional(),
+  dueDate: z.coerce.date().optional(),
   priority: z.enum(['HIGH', 'MEDIUM', 'LOW']).default('MEDIUM'),
   status: z.enum(['TODO', 'IN_PROGRESS', 'COMPLETED']).default('TODO'),
 });

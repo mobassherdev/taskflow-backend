@@ -95,7 +95,20 @@ export class ProjectService {
 
   async delete(id: string, userId: string) {
     await this.assertOwnerOrAdmin(id, userId);
+
+    const project = await prisma.project.findUnique({ where: { id } });
+    if (!project) throw new ApiError(404, 'Project not found');
+
     await prisma.project.delete({ where: { id } });
+
+    logActivity({
+      action: 'PROJECT_DELETED',
+      entityType: 'Project',
+      entityId: id,
+      entityName: project.name,
+      description: `Project "${project.name}" was deleted`,
+      actorId: userId,
+    });
   }
 
   async addMember(projectId: string, memberId: string, actorId: string) {
