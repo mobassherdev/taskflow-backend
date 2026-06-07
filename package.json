@@ -9,7 +9,8 @@
     "prisma-dbpush": "npx prisma db push",
     "prisma-studio": "npx prisma studio",
     "prisma-reset": "npx prisma migrate reset",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "seed:demo": "tsx src/demoDataSeed.ts"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",
