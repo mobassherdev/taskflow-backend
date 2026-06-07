@@ -6,6 +6,7 @@
     "build": "prisma generate && tsc",
     "start": "node dist/index.js",
     "prisma-generate": "npx prisma generate",
+    "postinstall": "prisma generate",
     "prisma-dbpush": "npx prisma db push",
     "prisma-studio": "npx prisma studio",
     "prisma-reset": "npx prisma migrate reset",
