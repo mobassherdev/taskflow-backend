@@ -9,3 +9,17 @@ const prisma = globalForPrisma.prisma ?? new PrismaClient({
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 export default prisma;
+
+/**
+ * Connect to the database
+ */
+export async function connectDB(): Promise<void> {
+  await prisma.$connect();
+}
+
+/**
+ * Disconnect from the database
+ */
+export async function disconnectDB(): Promise<void> {
+  await prisma.$disconnect();
+}
