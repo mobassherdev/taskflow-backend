@@ -55,7 +55,34 @@ export class UserService {
   async delete(id: string) {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) throw new ApiError(404, 'User not found');
-    await prisma.user.delete({ where: { id } });
+
+    await prisma.$transaction(async (tx) => {
+      // Delete records with required relations that lack cascade
+      await tx.activityLog.deleteMany({ where: { actorId: id } });
+      await tx.comment.deleteMany({ where: { authorId: id } });
+
+      // Find a fallback user to reassign ownership
+      const fallbackOwner = await tx.user.findFirst({
+        where: { id: { not: id } },
+        select: { id: true },
+      });
+      const reassignTo = fallbackOwner?.id ?? id;
+
+      // Reassign tasks where user is creator
+      await tx.task.updateMany({
+        where: { creatorId: id },
+        data: { creatorId: reassignTo },
+      });
+
+      // Reassign project ownership
+      await tx.project.updateMany({
+        where: { ownerId: id },
+        data: { ownerId: reassignTo },
+      });
+
+      // Delete user (cascades: ProjectMember, Notification, assigned Tasks)
+      await tx.user.delete({ where: { id } });
+    });
   }
 }
 
