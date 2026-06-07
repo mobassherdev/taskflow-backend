@@ -9,12 +9,12 @@ export const createProject = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const getProjects = asyncHandler(async (req: Request, res: Response) => {
-  const result = await projectService.findAll(req.query as any, req.user!.id);
+  const result = await projectService.findAll(req.query as any, req.user!.id, req.user!.role);
   res.json(new ApiResponse(200, result));
 });
 
 export const getProject = asyncHandler(async (req: Request, res: Response) => {
-  const project = await projectService.findById(req.params.id, req.user!.id);
+  const project = await projectService.findById(req.params.id, req.user!.id, req.user!.role);
   res.json(new ApiResponse(200, project));
 });
 

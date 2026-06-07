@@ -4,12 +4,12 @@ import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/asyncHandler';
 
 export const createTask = asyncHandler(async (req: Request, res: Response) => {
-  const task = await taskService.create(req.params.projectId, req.body, req.user!.id);
+  const task = await taskService.create(req.params.projectId, req.body, req.user!.id, req.user!.role);
   res.status(201).json(new ApiResponse(201, task, 'Task created successfully'));
 });
 
 export const getTasksByProject = asyncHandler(async (req: Request, res: Response) => {
-  const result = await taskService.findByProject(req.params.projectId, req.query as any, req.user!.id);
+  const result = await taskService.findByProject(req.params.projectId, req.query as any, req.user!.id, req.user!.role);
   res.json(new ApiResponse(200, result));
 });
 
@@ -24,12 +24,12 @@ export const updateTask = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const deleteTask = asyncHandler(async (req: Request, res: Response) => {
-  await taskService.delete(req.params.id, req.user!.id);
+  await taskService.delete(req.params.id, req.user!.id, req.user!.role);
   res.json(new ApiResponse(200, null, 'Task deleted successfully'));
 });
 
 export const addComment = asyncHandler(async (req: Request, res: Response) => {
-  const comment = await taskService.addComment(req.params.id, req.body.body, req.user!.id);
+  const comment = await taskService.addComment(req.params.id, req.body.body, req.user!.id, req.user!.role);
   res.status(201).json(new ApiResponse(201, comment, 'Comment added successfully'));
 });
 

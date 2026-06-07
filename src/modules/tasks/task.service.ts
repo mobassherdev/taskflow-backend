@@ -10,7 +10,10 @@ import {
   taskQuerySchema,
 } from './task.schema';
 
-async function assertProjectMember(projectId: string, userId: string) {
+async function assertProjectMember(projectId: string, userId: string, userRole?: string) {
+  // Admins have full access to all projects and their tasks
+  if (userRole === 'ADMIN') return;
+
   const member = await prisma.projectMember.findUnique({
     where: { projectId_userId: { projectId, userId } },
   });
@@ -18,8 +21,8 @@ async function assertProjectMember(projectId: string, userId: string) {
 }
 
 export class TaskService {
-  async create(projectId: string, dto: z.infer<typeof createTaskSchema>, creatorId: string) {
-    await assertProjectMember(projectId, creatorId);
+  async create(projectId: string, dto: z.infer<typeof createTaskSchema>, creatorId: string, creatorRole?: string) {
+    await assertProjectMember(projectId, creatorId, creatorRole);
 
     // Rule: prevent duplicate task titles within the same project
     const duplicate = await prisma.task.findFirst({
@@ -32,8 +35,8 @@ export class TaskService {
       throw new ApiError(400, 'Completed tasks cannot be reassigned');
     }
 
-    // Rule: prevent assigning to non-project-member
-    if (dto.assigneeId) {
+    // Rule: prevent assigning to non-project-member (admins can assign anyone)
+    if (dto.assigneeId && creatorRole !== 'ADMIN') {
       const assigneeMember = await prisma.projectMember.findUnique({
         where: { projectId_userId: { projectId, userId: dto.assigneeId } },
       });
@@ -76,8 +79,9 @@ export class TaskService {
     projectId: string,
     query: z.infer<typeof taskQuerySchema>,
     userId: string,
+    userRole?: string,
   ) {
-    await assertProjectMember(projectId, userId);
+    await assertProjectMember(projectId, userId, userRole);
 
     const { page, limit, skip, orderBy } = parsePagination(query);
     const now = new Date();
@@ -143,7 +147,7 @@ export class TaskService {
     const existing = await prisma.task.findUnique({ where: { id } });
     if (!existing) throw new ApiError(404, 'Task not found');
 
-    await assertProjectMember(existing.projectId, actorId);
+    await assertProjectMember(existing.projectId, actorId, actorRole);
 
     // Role restriction: TEAM_MEMBER can only update status on their own assigned task
     if (actorRole === 'TEAM_MEMBER') {
@@ -221,11 +225,11 @@ export class TaskService {
     return task;
   }
 
-  async delete(id: string, actorId: string) {
+  async delete(id: string, actorId: string, actorRole?: string) {
     const task = await prisma.task.findUnique({ where: { id } });
     if (!task) throw new ApiError(404, 'Task not found');
 
-    await assertProjectMember(task.projectId, actorId);
+    await assertProjectMember(task.projectId, actorId, actorRole);
 
     await prisma.task.delete({ where: { id } });
 
@@ -240,11 +244,11 @@ export class TaskService {
     });
   }
 
-  async addComment(taskId: string, body: string, authorId: string) {
+  async addComment(taskId: string, body: string, authorId: string, authorRole?: string) {
     const task = await prisma.task.findUnique({ where: { id: taskId } });
     if (!task) throw new ApiError(404, 'Task not found');
 
-    await assertProjectMember(task.projectId, authorId);
+    await assertProjectMember(task.projectId, authorId, authorRole);
 
     const comment = await prisma.comment.create({
       data: { body, taskId, authorId },

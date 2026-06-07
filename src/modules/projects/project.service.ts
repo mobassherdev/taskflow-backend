@@ -33,11 +33,14 @@ export class ProjectService {
     return project;
   }
 
-  async findAll(query: z.infer<typeof projectQuerySchema>, userId: string) {
+  async findAll(query: z.infer<typeof projectQuerySchema>, userId: string, userRole?: string) {
     const { page, limit, skip, orderBy } = parsePagination(query);
 
+    const isAdmin = userRole === 'ADMIN';
+
     const where = {
-      members: { some: { userId } },
+      // Admins can see all projects; others only see projects they're a member of
+      ...(isAdmin ? {} : { members: { some: { userId } } }),
       ...(query.status && { status: query.status }),
       ...(query.search && {
         name: { contains: query.search, mode: 'insensitive' as const },
@@ -61,9 +64,12 @@ export class ProjectService {
     return { projects, pagination: buildPaginationMeta(total, page, limit) };
   }
 
-  async findById(id: string, userId: string) {
+  async findById(id: string, userId: string, userRole?: string) {
+    const isAdmin = userRole === 'ADMIN';
+
     const project = await prisma.project.findFirst({
-      where: { id, members: { some: { userId } } },
+      // Admins can access any project; others must be a member
+      where: isAdmin ? { id } : { id, members: { some: { userId } } },
       include: {
         owner: { select: { id: true, name: true, avatar: true } },
         members: {
