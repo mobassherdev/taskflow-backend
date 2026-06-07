@@ -4,7 +4,7 @@ import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/asyncHandler';
 
 export const getDashboard = asyncHandler(async (req: Request, res: Response) => {
-  const dashboard = await analyticsService.getDashboard(req.user!.id);
+  const dashboard = await analyticsService.getDashboard(req.user!.id, req.user!.role);
   res.json(new ApiResponse(200, dashboard));
 });
 

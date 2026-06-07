@@ -1,12 +1,20 @@
 import prisma from '../../config/database';
 
 export class AnalyticsService {
-  async getDashboard(userId: string) {
+  async getDashboard(userId: string, userRole?: string) {
     const now = new Date();
+    const isAdmin = userRole === 'ADMIN';
 
-    const memberProjectIds = await prisma.projectMember
-      .findMany({ where: { userId }, select: { projectId: true } })
-      .then(rows => rows.map(r => r.projectId));
+    // Admins see all projects; non-admins only see projects they're a member of
+    const projectFilter = isAdmin
+      ? {}
+      : {
+          projectId: {
+            in: await prisma.projectMember
+              .findMany({ where: { userId }, select: { projectId: true } })
+              .then(rows => rows.map(r => r.projectId)),
+          },
+        };
 
     const [
       totalProjects,
@@ -18,24 +26,24 @@ export class AnalyticsService {
       tasksByStatus,
       memberWorkload,
     ] = await Promise.all([
-      prisma.project.count({ where: { id: { in: memberProjectIds } } }),
+      prisma.project.count({ where: isAdmin ? {} : { id: projectFilter.projectId } }),
 
-      prisma.task.count({ where: { projectId: { in: memberProjectIds } } }),
+      prisma.task.count({ where: projectFilter }),
 
       prisma.task.count({
-        where: { projectId: { in: memberProjectIds }, status: 'COMPLETED' },
+        where: { ...projectFilter, status: 'COMPLETED' },
       }),
 
       prisma.task.count({
         where: {
-          projectId: { in: memberProjectIds },
+          ...projectFilter,
           dueDate: { lt: now },
           status: { not: 'COMPLETED' },
         },
       }),
 
       prisma.activityLog.findMany({
-        where: { projectId: { in: memberProjectIds } },
+        where: isAdmin ? {} : { projectId: projectFilter.projectId },
         orderBy: { createdAt: 'desc' },
         take: 10,
         include: { actor: { select: { id: true, name: true, avatar: true } } },
@@ -43,20 +51,20 @@ export class AnalyticsService {
 
       prisma.task.groupBy({
         by: ['priority'],
-        where: { projectId: { in: memberProjectIds } },
+        where: projectFilter,
         _count: { _all: true },
       }),
 
       prisma.task.groupBy({
         by: ['status'],
-        where: { projectId: { in: memberProjectIds } },
+        where: projectFilter,
         _count: { _all: true },
       }),
 
       prisma.task.groupBy({
         by: ['assigneeId'],
         where: {
-          projectId: { in: memberProjectIds },
+          ...projectFilter,
           assigneeId: { not: null },
         },
         _count: { _all: true },
@@ -73,7 +81,7 @@ export class AnalyticsService {
     const completedPerMember = await prisma.task.groupBy({
       by: ['assigneeId'],
       where: {
-        projectId: { in: memberProjectIds },
+        ...projectFilter,
         assigneeId: { in: assigneeIds },
         status: 'COMPLETED',
       },
