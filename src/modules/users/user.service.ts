@@ -2,6 +2,7 @@ import prisma from '../../config/database';
 import { ApiError } from '../../utils/ApiError';
 import { parsePagination, buildPaginationMeta } from '../../utils/pagination';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 import { updateUserSchema, userQuerySchema } from './user.schema';
 
 export class UserService {
@@ -45,9 +46,25 @@ export class UserService {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) throw new ApiError(404, 'User not found');
 
+    const data: Record<string, any> = {};
+
+    if (dto.name !== undefined) data.name = dto.name;
+    if (dto.avatar !== undefined) data.avatar = dto.avatar;
+    if (dto.role !== undefined) data.role = dto.role;
+
+    if (dto.email !== undefined && dto.email !== user.email) {
+      const existing = await prisma.user.findUnique({ where: { email: dto.email } });
+      if (existing) throw new ApiError(409, 'Email already in use');
+      data.email = dto.email;
+    }
+
+    if (dto.password) {
+      data.password = await bcrypt.hash(dto.password, 12);
+    }
+
     return prisma.user.update({
       where: { id },
-      data: dto,
+      data,
       select: { id: true, name: true, email: true, role: true, avatar: true, createdAt: true },
     });
   }
