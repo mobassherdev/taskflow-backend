@@ -169,3 +169,10 @@ backend/
 │   ├── app.ts                  # Express app setup
 │   └── index.ts                # Server entry point
 ```
+License
+MIT License
+
+---
+
+More Projects and Information
+👉 Explore additional projects and find out more about my work on my portfolio website: [Md Mobassher Hossain](https://mobassher.com)
