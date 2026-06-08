@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/authenticate';
+import { authenticate } from '../../common/middleware/authenticate';
 import { getDashboard, getProjectProgress } from './analytics.controller';
 
-const router = Router();
+const router : Router = Router();
 router.use(authenticate);
 
 router.get('/dashboard', getDashboard);

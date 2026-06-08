@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
+import { ApiResponse } from '../../common/utils/ApiResponse';
+import { asyncHandler } from '../../common/utils/asyncHandler';
 import { projectService } from './project.service';
-import { ApiResponse } from '../../utils/ApiResponse';
-import { asyncHandler } from '../../utils/asyncHandler';
 
 export const createProject = asyncHandler(async (req: Request, res: Response) => {
   const project = await projectService.create(req.body, req.user!.id);

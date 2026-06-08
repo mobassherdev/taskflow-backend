@@ -1,11 +1,11 @@
 {
-  "buildCommand": "prisma generate && tsc",
-  "outputDirectory": "dist",
+  "version": 2,
   "installCommand": "pnpm install",
-  "framework": null,
-  "env": {
-    "DATABASE_URL": "@database-url",
-    "JWT_SECRET": "@jwt-secret",
-    "JWT_REFRESH_SECRET": "@jwt-refresh-secret"
-  }
+  "buildCommand": "pnpm build",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ]
 }

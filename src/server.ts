@@ -3,7 +3,7 @@ dotenv.config();
 
 import { Server } from 'http';
 import app from './app';
-import { connectDB, disconnectDB } from './config/database';
+import { connectDB, disconnectDB } from './config/db';
 import { env } from './config/env';
 
 let server: Server;
@@ -19,14 +19,14 @@ async function bootstrap(): Promise<void> {
     console.log('✅ Database connection established.');
 
     // 2. Start Express Server
-    server = app.listen(env.PORT, () => {
+    server = app.listen(env.port, () => {
       console.log('\n' + '='.repeat(50));
       console.log('   🚀 TASKFLOW - BACKEND IS LIVE');
       console.log('='.repeat(50));
-      console.log(`   - Environment: ${env.NODE_ENV}`);
-      console.log(`   - Local:       http://localhost:${env.PORT}`);
-      console.log(`   - Health:      http://localhost:${env.PORT}/health`);
-      console.log(`   - CORS:        ${env.CLIENT_URL}`);
+      console.log(`   - Environment: ${env.nodeEnv}`);
+      console.log(`   - Local:       http://localhost:${env.port}`);
+      console.log(`   - Health:      http://localhost:${env.port}/health`);
+      console.log(`   - CORS:        ${env.corsOrigin.join(', ')}`);
       console.log('='.repeat(50) + '\n');
     });
 

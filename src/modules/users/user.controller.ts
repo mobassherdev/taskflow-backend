@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
+import { ApiResponse } from '../../common/utils/ApiResponse';
+import { asyncHandler } from '../../common/utils/asyncHandler';
 import { userService } from './user.service';
-import { ApiResponse } from '../../utils/ApiResponse';
-import { asyncHandler } from '../../utils/asyncHandler';
 
 export const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const result = await userService.findAll(req.query as any);

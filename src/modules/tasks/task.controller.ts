@@ -1,7 +1,8 @@
+import prisma from '../../config/db';
 import { Request, Response } from 'express';
+import { ApiResponse } from '../../common/utils/ApiResponse';
+import { asyncHandler } from '../../common/utils/asyncHandler';
 import { taskService } from './task.service';
-import { ApiResponse } from '../../utils/ApiResponse';
-import { asyncHandler } from '../../utils/asyncHandler';
 
 export const createTask = asyncHandler(async (req: Request, res: Response) => {
   const task = await taskService.create(req.params.projectId, req.body, req.user!.id, req.user!.role);
@@ -40,8 +41,6 @@ export const uploadAttachment = asyncHandler(async (req: Request, res: Response)
   }
 
   const { v2: cloudinary } = await import('cloudinary');
-  const prisma = (await import('../../config/database')).default;
-
   const b64 = file.buffer.toString('base64');
   const dataURI = `data:${file.mimetype};base64,${b64}`;
 

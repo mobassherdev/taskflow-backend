@@ -1,20 +1,20 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/authenticate';
-import { authorize } from '../../middleware/authorize';
-import { validate } from '../../middleware/validate';
-import { createTaskSchema, updateTaskSchema, addCommentSchema } from './task.schema';
-import {
-  createTask,
-  getTasksByProject,
-  getTask,
-  updateTask,
-  deleteTask,
-  addComment,
-  uploadAttachment,
-} from './task.controller';
+import { authenticate } from '../../common/middleware/authenticate';
+import { authorize } from '../../common/middleware/authorize';
+import { validate } from '../../common/middleware/validate';
 import { uploadMiddleware } from '../upload/upload.controller';
+import {
+    addComment,
+    createTask,
+    deleteTask,
+    getTask,
+    getTasksByProject,
+    updateTask,
+    uploadAttachment,
+} from './task.controller';
+import { addCommentSchema, createTaskSchema, updateTaskSchema } from './task.schema';
 
-const router = Router({ mergeParams: true }); // mergeParams for /projects/:projectId/tasks
+const router : Router = Router({ mergeParams: true }); // mergeParams for /projects/:projectId/tasks
 router.use(authenticate);
 
 router.get('/', getTasksByProject);

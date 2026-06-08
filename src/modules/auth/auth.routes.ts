@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { signup, login, refresh, me, changePassword } from './auth.controller';
-import { validate } from '../../middleware/validate';
-import { authenticate } from '../../middleware/authenticate';
-import { signupSchema, loginSchema, changePasswordSchema } from './auth.schema';
+import { authenticate } from '../../common/middleware/authenticate';
+import { validate } from '../../common/middleware/validate';
+import { changePassword, login, me, refresh, signup } from './auth.controller';
+import { changePasswordSchema, loginSchema, signupSchema } from './auth.schema';
 
-const router = Router();
+const router : Router = Router();
 
 router.post('/signup', validate(signupSchema), signup);
 router.post('/login', validate(loginSchema), login);

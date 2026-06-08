@@ -1,22 +1,23 @@
+import prisma from "../../config/db";
+import { env } from '../../config/env';
 import { v2 as cloudinary } from 'cloudinary';
-import multer from 'multer';
 import { Request, Response } from 'express';
-import { ApiResponse } from '../../utils/ApiResponse';
-import { asyncHandler } from '../../utils/asyncHandler';
-import { ApiError } from '../../utils/ApiError';
-import prisma from '../../config/database';
+import multer from 'multer';
+import { ApiError } from '../../common/utils/ApiError';
+import { ApiResponse } from '../../common/utils/ApiResponse';
+import { asyncHandler } from '../../common/utils/asyncHandler';
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: env.cloudinary.cloudName,
+  api_key: env.cloudinary.apiKey,
+  api_secret: env.cloudinary.apiSecret,
 });
 
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   limits: {
-    fileSize: parseInt(process.env.MAX_FILE_SIZE_MB ?? '5') * 1024 * 1024,
+    fileSize: env.maxFileSizeMB * 1024 * 1024,
   },
   fileFilter: (_req, file, cb) => {
     const allowed = [
@@ -34,7 +35,7 @@ const upload = multer({
   },
 });
 
-export const uploadMiddleware = upload.single('file');
+export const uploadMiddleware: ReturnType<typeof upload.single> = upload.single('file');
 
 export const uploadFile = asyncHandler(async (req: Request, res: Response) => {
   const file = req.file;

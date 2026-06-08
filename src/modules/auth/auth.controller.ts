@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
+import { ApiResponse } from '../../common/utils/ApiResponse';
+import { asyncHandler } from '../../common/utils/asyncHandler';
 import { authService } from './auth.service';
-import { ApiResponse } from '../../utils/ApiResponse';
-import { asyncHandler } from '../../utils/asyncHandler';
 
 export const signup = asyncHandler(async (req: Request, res: Response) => {
   const result = await authService.signup(req.body);

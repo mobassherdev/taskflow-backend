@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import prisma from "../../config/db";
+import { env } from "../../config/env";
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { ApiError } from '../utils/ApiError';
-import prisma from '../config/database';
 import { JwtPayload } from '../types';
+import { ApiError } from '../utils/ApiError';
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -12,7 +13,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     }
 
     const token = authHeader.split(' ')[1];
-    const payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    const payload = jwt.verify(token, env.jwt.accessSecret) as JwtPayload;
     const user = await prisma.user.findUnique({ where: { id: payload.userId } });
     if (!user) {
       throw new ApiError(401, 'User no longer exists');

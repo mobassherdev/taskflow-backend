@@ -1,9 +1,10 @@
+import prisma from "../../config/db";
+import { env } from "../../config/env";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import prisma from '../../config/database';
-import { ApiError } from '../../utils/ApiError';
 import { z } from 'zod';
-import { loginSchema, signupSchema, changePasswordSchema } from './auth.schema';
+import { ApiError } from '../../common/utils/ApiError';
+import { changePasswordSchema, loginSchema, signupSchema } from './auth.schema';
 
 export class AuthService {
   async signup(dto: z.infer<typeof signupSchema>) {
@@ -35,20 +36,20 @@ export class AuthService {
   generateTokens(userId: string, role: string) {
     const accessToken = jwt.sign(
       { userId, role },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN ?? '7d' } as any,
+      env.jwt.accessSecret,
+      { expiresIn: env.jwt.accessExpiry } as any,
     );
     const refreshToken = jwt.sign(
       { userId, role },
-      process.env.JWT_REFRESH_SECRET!,
-      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '30d' } as any,
+      env.jwt.refreshSecret,
+      { expiresIn: env.jwt.refreshExpiry } as any,
     );
     return { accessToken, refreshToken };
   }
 
   async refreshToken(token: string) {
     try {
-      const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET!) as { userId: string; role: string };
+      const payload = jwt.verify(token, env.jwt.refreshSecret) as { userId: string; role: string };
       const user = await prisma.user.findUnique({ where: { id: payload.userId } });
       if (!user) throw new ApiError(401, 'User not found');
       return this.generateTokens(user.id, user.role);

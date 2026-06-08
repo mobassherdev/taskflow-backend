@@ -1,13 +1,13 @@
-import prisma from '../../config/database';
-import { ApiError } from '../../utils/ApiError';
-import { logActivity } from '../../utils/activityLogger';
-import { parsePagination, buildPaginationMeta } from '../../utils/pagination';
-import { createNotification, createNotificationsForProjectMembers } from '../notifications/notification.service';
+import prisma from "../../config/db";
 import { z } from 'zod';
+import { ApiError } from '../../common/utils/ApiError';
+import { logActivity } from '../../common/utils/activityLogger';
+import { buildPaginationMeta, parsePagination } from '../../common/utils/pagination';
+import { createNotification } from '../notifications/notification.service';
 import {
   createTaskSchema,
-  updateTaskSchema,
   taskQuerySchema,
+  updateTaskSchema,
 } from './task.schema';
 
 async function assertProjectMember(projectId: string, userId: string, userRole?: string) {

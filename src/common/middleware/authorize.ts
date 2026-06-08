@@ -1,5 +1,5 @@
-import { Role } from '@prisma/client';
-import { Request, Response, NextFunction } from 'express';
+import { Role } from '../../generated/prisma';
+import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '../utils/ApiError';
 
 export const authorize = (...roles: Role[]) =>

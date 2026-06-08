@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/authenticate';
-import { uploadMiddleware, uploadFile } from './upload.controller';
+import { authenticate } from '../../common/middleware/authenticate';
+import { uploadFile, uploadMiddleware } from './upload.controller';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 router.use(authenticate);
 
 router.post('/', uploadMiddleware, uploadFile);

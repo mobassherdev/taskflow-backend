@@ -1,23 +1,23 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/authenticate';
-import { authorize } from '../../middleware/authorize';
-import { validate } from '../../middleware/validate';
+import { authenticate } from '../../common/middleware/authenticate';
+import { authorize } from '../../common/middleware/authorize';
+import { validate } from '../../common/middleware/validate';
 import {
-  createProjectSchema,
-  updateProjectSchema,
-  addMemberSchema,
-} from './project.schema';
-import {
-  createProject,
-  getProjects,
-  getProject,
-  updateProject,
-  deleteProject,
-  addMember,
-  removeMember,
+    addMember,
+    createProject,
+    deleteProject,
+    getProject,
+    getProjects,
+    removeMember,
+    updateProject,
 } from './project.controller';
+import {
+    addMemberSchema,
+    createProjectSchema,
+    updateProjectSchema,
+} from './project.schema';
 
-const router = Router();
+const router : Router = Router();
 router.use(authenticate);
 
 router.get('/', getProjects);

@@ -1,8 +1,7 @@
+import prisma from '../../config/db';
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import prisma from '../../config/database';
-import { ApiResponse } from '../../utils/ApiResponse';
-import { asyncHandler } from '../../utils/asyncHandler';
+import { ApiResponse } from '../../common/utils/ApiResponse';
+import { asyncHandler } from '../../common/utils/asyncHandler';
 
 const p = prisma as any;
 

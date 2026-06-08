@@ -1,8 +1,8 @@
-import prisma from '../../config/database';
-import { ApiError } from '../../utils/ApiError';
-import { parsePagination, buildPaginationMeta } from '../../utils/pagination';
-import { z } from 'zod';
+import prisma from "../../config/db";
 import bcrypt from 'bcryptjs';
+import { z } from 'zod';
+import { ApiError } from '../../common/utils/ApiError';
+import { buildPaginationMeta, parsePagination } from '../../common/utils/pagination';
 import { updateUserSchema, userQuerySchema } from './user.schema';
 
 export class UserService {

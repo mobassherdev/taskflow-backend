@@ -1,12 +1,25 @@
 {
   "name": "taskflow-backend",
   "version": "1.0.0",
+  "description": "TaskFlow Backend",
+  "main": "dist/server.js",
+  "author": "Md Mobassher Hossain <mobassherdev@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobassherdev/taskflow-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mobassherdev/taskflow-backend/issues"
+  },
+  "homepage": "https://github.com/mobassherdev/taskflow-backend#readme",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && tsc",
-    "start": "node dist/index.js",
+    "dev": "tsx watch src/server.ts",
+    "build": "prisma generate && tsc && shx mkdir -p dist/generated && shx cp -r src/generated/* dist/generated/ && tsc-alias",
+    "start": "node dist/server.js",
+    "lint": "eslint src/",
     "prisma-generate": "npx prisma generate",
-    "postinstall": "prisma generate",
+    "prisma-migrate": "npx prisma migrate dev",
     "prisma-dbpush": "npx prisma db push",
     "prisma-studio": "npx prisma studio",
     "prisma-reset": "npx prisma migrate reset",
@@ -22,6 +35,7 @@
     "express-rate-limit": "^7.3.1",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mkdirp": "^3.0.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "zod": "^3.23.8"
@@ -35,6 +49,8 @@
     "@types/multer": "^1.4.11",
     "@types/node": "^20.14.2",
     "prisma": "^6.19.0",
+    "shx": "^0.4.0",
+    "tsc-alias": "^1.8.17",
     "tsx": "^4.15.4",
     "typescript": "^5.4.5"
   },
